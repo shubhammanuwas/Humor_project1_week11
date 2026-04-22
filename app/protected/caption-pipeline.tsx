@@ -1,6 +1,7 @@
 'use client'
 
-import { FormEvent, useMemo, useState } from 'react'
+import { FormEvent, useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser'
 
 const API_BASE_URL = 'https://api.almostcrackd.ai'
@@ -43,17 +44,33 @@ function pickCaptionText(record: CaptionRecord): string {
 }
 
 export default function CaptionPipeline() {
+  const router = useRouter()
   const [file, setFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [captions, setCaptions] = useState<CaptionRecord[]>([])
   const [lastImageId, setLastImageId] = useState<string | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   const fileTypeValid = useMemo(() => {
     if (!file) {
       return true
     }
     return SUPPORTED_TYPES.has(file.type.toLowerCase())
+  }, [file])
+
+  useEffect(() => {
+    if (!file) {
+      setPreviewUrl(null)
+      return
+    }
+
+    const objectUrl = URL.createObjectURL(file)
+    setPreviewUrl(objectUrl)
+
+    return () => {
+      URL.revokeObjectURL(objectUrl)
+    }
   }, [file])
 
   const runPipeline = async (event: FormEvent<HTMLFormElement>) => {
@@ -157,6 +174,7 @@ export default function CaptionPipeline() {
         : ((step4Data as { captions?: CaptionRecord[] } | null)?.captions ?? [])
 
       setCaptions(list)
+      router.refresh()
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error'
       setErrorMessage(message)
@@ -192,6 +210,12 @@ export default function CaptionPipeline() {
             Selected file: <span className="mono">{file.name}</span>
           </div>
         ) : null}
+        {previewUrl ? (
+          <div className="image-preview-card">
+            <div className="generated-caption-label">Selected image</div>
+            <img src={previewUrl} alt="Uploaded preview" className="image-preview" />
+          </div>
+        ) : null}
         <button
           type="submit"
           disabled={isLoading || !file || !fileTypeValid}
@@ -218,14 +242,20 @@ export default function CaptionPipeline() {
       ) : null}
 
       {captions.length > 0 ? (
-        <ul className="list-reset stack-sm generated-list">
+        <div className="stack-sm">
+          <div className="status-pill">
+            Generated captions were added to the main caption feed below. You can vote on them
+            there.
+          </div>
+          <ul className="list-reset stack-sm generated-list">
           {captions.map((record, index) => (
             <li key={`generated-caption-${index}`} className="card generated-caption-card">
               <div className="generated-caption-label">Generated #{index + 1}</div>
               <p className="caption-text">{pickCaptionText(record)}</p>
             </li>
           ))}
-        </ul>
+          </ul>
+        </div>
       ) : null}
     </section>
   )

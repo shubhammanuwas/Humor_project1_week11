@@ -454,6 +454,25 @@ a {
   margin-bottom: 0.35rem;
 }
 
+.image-preview-card {
+  border: 1px solid rgba(23, 105, 224, 0.12);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(236, 246, 255, 0.92));
+  padding: 0.85rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.image-preview {
+  display: block;
+  width: 100%;
+  max-height: 360px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid rgba(23, 32, 51, 0.08);
+  box-shadow: 0 12px 24px rgba(19, 42, 81, 0.12);
+}
+
 .soft-divider {
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(23, 32, 51, 0.12), transparent);

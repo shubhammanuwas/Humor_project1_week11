@@ -155,7 +155,11 @@ async function voteCaption(formData: FormData) {
 
 async function getCaptions() {
   const supabase = createSupabaseServerClient()
-  const { data, error } = await supabase.from('captions').select('*').limit(25)
+  const { data, error } = await supabase
+    .from('captions')
+    .select('*')
+    .order('created_datetime_utc', { ascending: false })
+    .limit(25)
 
   if (error) {
     console.error('Captions fetch error:', error.message)

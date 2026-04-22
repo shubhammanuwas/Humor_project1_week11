@@ -81,7 +81,8 @@ const TABLE_CONFIGS: TableConfig[] = [
     mode: 'crud',
     limit: 80,
     preferredColumns: ['id', 'term', 'definition'],
-    createExample: '{"term":"admin-test-term","definition":"created from admin","example":"admin example","priority":1}',
+    createExample:
+      '{"term":"admin-test-term","definition":"created from admin","example":"admin example","priority":1}',
     updateExample: '{"definition":"updated from admin"}',
   },
   {
